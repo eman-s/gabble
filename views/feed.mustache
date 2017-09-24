@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+  </head>
+  <body>
+
+    <h1>WELCOME {{currentUser.username}}</h1>
+    <br>
+    <form class="" action="/feed" method="post">
+      <input type="text" name="title" placeholder="post title">
+      <input type="text" name="question" placeholder="type your question here">
+      <button>POST</button>
+    </form>
+    <br>
+    {{#postInfo}}
+    <h2>{{title}}</h2>
+    <h3>Posted By: {{username}}</h3>
+    <p>{{body}}</p>
+    <form class="dlete_msg" action="/feed/message/{{user_id}}/delete" method="post">
+      <button name="button">Delete</button>
+    </form>
+    <br>
+    {{/postInfo}}
+    <a href="/logout">LOG OUT</a>
+  </body>
+</html>
