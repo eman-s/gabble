@@ -16,10 +16,16 @@
     <br>
     {{#postInfo}}
     <h2>{{title}}</h2>
-    <h3>Posted By: {{username}}</h3>
+    <h3>Posted By: {{username}}</sh3>
     <p>{{body}}</p>
-    <form class="dlete_msg" action="/feed/message/{{user_id}}/delete" method="post">
+    <p>Likes:{{like_count}}</p>
+    <a href="/feed/message/{{id}}/about">Who Liked<a>
+    <form class="dlete_msg" action="/feed/message/{{id}}/delete" method="post">
       <button name="button">Delete</button>
+    </form>
+
+    <form class='like_msg' action='/feed/message/{{id}}/like' method='post'>
+      <button>Like</button>
     </form>
     <br>
     {{/postInfo}}

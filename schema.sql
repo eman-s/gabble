@@ -23,3 +23,9 @@ CREATE TABLE answers (
   accepted BOOLEAN,
   body TEXT
 );
+
+CREATE TABLE likes (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER REFERENCES users(id),
+  question_id INTEGER REFERENCES questions(id)
+);

@@ -79,7 +79,7 @@ app.post('/login', passport.authenticate('local', {
 }))
 
 app.get('/feed',(req,res)=>{
-  client.query('SELECT username, user_id, title, body FROM users LEFT JOIN questions ON questions.user_id = users.id WHERE body !=$1' , [''], (err, dbResults) => {
+  client.query('SELECT COUNT(likes.id) like_count, questions.id, username, questions.user_id, title, body FROM questions LEFT JOIN users ON questions.user_id = users.id LEFT JOIN likes ON questions.id = likes.question_id GROUP BY questions.id, username' , (err, dbResults) => {
     if (err){
       console.log('error is!!!',err);
     }else{
@@ -95,11 +95,21 @@ app.get('/feed',(req,res)=>{
   console.log('user id is:',req.session.id );
 })
 
+app.get('/feed/message/:id/about', (req,res) => {
+  let postId = req.params.id
+  client.query('SELECT DISTINCT username FROM likes LEFT JOIN users ON users.id = likes.user_id LEFT JOIN questions ON questions.id = question_id WHERE question_id=$1', [postId], (err, dbResults)=>{
+    res.render('wholiked', {
+      users: dbResults.rows
+    })
+  })
+})
+
 app.post('/feed', (req,res)=>{
   const {title,question} = req.body;
   client.query('INSERT INTO questions(title,body, user_id) VALUES($1, $2, $3)', [title,question,req.user.id], (err, dbResponse)=>{
     console.log(dbResponse.rows);
     res.redirect('/feed');
+
   })
 })
 
@@ -108,7 +118,17 @@ app.post('/feed/message/:id/delete', (req, res)=>{
   console.log(postId);
   let currentUserId = req.user.id
   console.log(currentUserId);
-    client.query('DELETE FROM questions WHERE user_id =$1', [postId], (err, dbResponse)=>{
+    client.query('DELETE FROM questions WHERE id =$1', [postId], (err, dbResponse)=>{
+    })
+    res.redirect('/feed')
+})
+
+app.post('/feed/message/:id/like', (req, res)=>{
+  let postId = req.params.id
+  console.log(postId);
+  let currentUserId = req.user.id
+  console.log(currentUserId);
+    client.query('INSERT INTO likes(user_id, question_id) VALUES($1, $2)', [currentUserId, postId], (err, dbResponse)=>{
     })
     res.redirect('/feed')
 })
