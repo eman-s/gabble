@@ -79,15 +79,26 @@ app.post('/login', passport.authenticate('local', {
 }))
 
 app.get('/feed',(req,res)=>{
-  client.query('SELECT COUNT(likes.id) like_count, questions.id, username, questions.user_id, title, body FROM questions LEFT JOIN users ON questions.user_id = users.id LEFT JOIN likes ON questions.id = likes.question_id GROUP BY questions.id, username' , (err, dbResults) => {
+
+  client.query('SELECT COUNT(likes.id) like_count, questions.id, username, questions.user_id, title, body FROM questions LEFT JOIN users ON questions.user_id = users.id LEFT JOIN likes ON questions.id = likes.question_id GROUP BY questions.id, username',(err, dbResults) => {
     if (err){
       console.log('error is!!!',err);
     }else{
+
+      dbResults.rows.forEach(message =>{
+        if (message.user_id === req.session.passport.user){
+          message.author=true;
+        }else{
+          message.author=false;
+        }
+      })
       console.log(dbResults.rows);
       res.render('feed', {
         postInfo: dbResults.rows,
         currentUser: req.user
       });
+      console.log('req.user IS:', req.user);
+      console.log("dbResults are:", dbResults.rows);
     }
     // res.json(results.rows)
     // res.send(results.rows)
@@ -113,14 +124,17 @@ app.post('/feed', (req,res)=>{
   })
 })
 
+
 app.post('/feed/message/:id/delete', (req, res)=>{
   let postId = req.params.id
   console.log(postId);
   let currentUserId = req.user.id
   console.log(currentUserId);
-    client.query('DELETE FROM questions WHERE id =$1', [postId], (err, dbResponse)=>{
+    client.query('DELETE FROM likes WHERE question_id=$1', [postId], (err, dbResponse)=>{
+      client.query('DELETE FROM questions WHERE id=$1', [postId], (err,dbResponse)=>{
+        res.redirect('/feed')
+      })
     })
-    res.redirect('/feed')
 })
 
 app.post('/feed/message/:id/like', (req, res)=>{

@@ -20,9 +20,11 @@
     <p>{{body}}</p>
     <p>Likes:{{like_count}}</p>
     <a href="/feed/message/{{id}}/about">Who Liked<a>
-    <form class="dlete_msg" action="/feed/message/{{id}}/delete" method="post">
-      <button name="button">Delete</button>
-    </form>
+      {{#author}}
+      <form class="dlete_msg" action="/feed/message/{{id}}/delete" method="post">
+        <button>Delete</button>
+      </form>
+      {{/author}}
 
     <form class='like_msg' action='/feed/message/{{id}}/like' method='post'>
       <button>Like</button>
