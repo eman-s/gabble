@@ -78,6 +78,11 @@ app.post('/login', passport.authenticate('local', {
   failureRedirect: '/login'
 }))
 
+app.get('/logout', (req,res)=>{
+  req.session.destroy()
+  res.redirect('/')
+})
+
 app.get('/feed',(req,res)=>{
 
   client.query('SELECT COUNT(likes.id) like_count, questions.id, username, questions.user_id, title, body FROM questions LEFT JOIN users ON questions.user_id = users.id LEFT JOIN likes ON questions.id = likes.question_id GROUP BY questions.id, username',(err, dbResults) => {
@@ -147,14 +152,9 @@ app.post('/feed/message/:id/like', (req, res)=>{
     res.redirect('/feed')
 })
 
-app.post('/logout',  (req, res) => {
-  req.session.destroy()
-  res.redirect('/')
-});
 
-app.get('/logout', (req,res)=>{
-  res.redirect('/')
-})
+
+
 
 app.listen(3000, ()=>{
   console.log("listening");
